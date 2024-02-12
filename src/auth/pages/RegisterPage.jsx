@@ -1,13 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import { AuthLayout } from "../layout";
 import { Button, Grid, Link, TextField, Typography } from "@mui/material";
-import { Google } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
+import { useForm } from "../../hooks";
+import { useDispatch } from "react-redux";
+import { startCreatingUserWithEmailPassword } from "../../store/auth";
+
+const formData = {
+  // email: "wpf@gmail.com",
+  // password: "123456",
+  // displayName: "Wandir Pereira",
+  email: "",
+  password: "",
+  displayName: "",
+};
+
+const formValidations = {
+  email: [(value) => value.includes("@"), "Email inválido!"],
+  password: [
+    (value) => value.length >= 6,
+    "Password deve ter mais de 6 caracteres!",
+  ],
+  displayName: [(value) => value.length >= 1, "Nome é obrigatório!"],
+};
 
 export const RegisterPage = () => {
+  const dispatch = useDispatch();
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const {
+    formState,
+    displayName,
+    email,
+    password,
+    onInputChange,
+    onResetForm,
+    isFormValid,
+    displayNameValid,
+    emailValid,
+    passwordValid,
+  } = useForm(formData, formValidations);
+
+  // console.log(displayNameValid);
+  const onSubmit = (event) => {
+    event.preventDefault();
+    setFormSubmitted(true);
+    if (!isFormValid) return;
+    // console.log(formState);
+    dispatch(startCreatingUserWithEmailPassword(formState));
+  };
+
   return (
     <AuthLayout title="Criar conta">
-      <form>
+      <h1>FormValid: {isFormValid ? "Válido" : "Incorreto"}</h1>
+      <form onSubmit={onSubmit}>
         <Grid container>
           <Grid item xs={12} sx={{ mt: 2 }}>
             <TextField
@@ -15,6 +60,12 @@ export const RegisterPage = () => {
               type="text"
               placeholder="Nome completo"
               fullWidth
+              name="displayName"
+              value={displayName}
+              onChange={onInputChange}
+              error={displayNameValid && formSubmitted}
+              // error={!!displayNameValid} para transformar null em binário false - não precisou
+              helperText={displayNameValid}
             />
           </Grid>
 
@@ -24,6 +75,11 @@ export const RegisterPage = () => {
               type="email"
               placeholder="correio@google.com"
               fullWidth
+              name="email"
+              value={email}
+              onChange={onInputChange}
+              error={emailValid && formSubmitted}
+              helperText={emailValid}
             />
           </Grid>
 
@@ -33,12 +89,17 @@ export const RegisterPage = () => {
               type="password"
               placeholder="ContrasenhaS"
               fullWidth
+              name="password"
+              value={password}
+              onChange={onInputChange}
+              error={passwordValid && formSubmitted}
+              helperText={passwordValid}
             />
           </Grid>
 
           <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
             <Grid item xs={12}>
-              <Button variant="contained" fullWidth>
+              <Button type="submit" variant="contained" fullWidth>
                 Criar conta
               </Button>
             </Grid>
