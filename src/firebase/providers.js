@@ -70,14 +70,16 @@ export const loginWithEmailPassword = async ({ email, password }) => {
     //   password
     // );
     // const { uid, photoURL, displayName } = resp.user;
-
+    console.log("provider: ", email);
+    console.log("provider: ", password);
     return {
       ok: true,
       uid: 987654321,
-      photoURL,
+      photoURL: "",
       displayName: "Wandir Pereira",
     };
   } catch (error) {
+    console.log(error);
     return { ok: false, errorMessage: error.message };
   }
 };
